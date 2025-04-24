@@ -2,40 +2,42 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 5f;
-    public float jumpForce = 7f;
+    [SerializeField] float speed = 5f;
+    [SerializeField] float jumpForce = 7f;
 
-    private Rigidbody2D rb;
-    private float moveInput;
-    private bool isGround = false;
+    Vector2 moveInput;
+
+    private Rigidbody2D rb2d;
+    private float move;
+    [SerializeField] bool isJumping = false;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        rb2d = GetComponent<Rigidbody2D>();
     }
 
     
     void Update()
     {
-        moveInput = Input.GetAxisRaw("Horizontal");
+        //moveInput = Input.GetAxisRaw("Horizontal");
+        //rb2d.linearVelocity = new Vector2(moveInput * speed, rb2d.linearVelocity.y);
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGround)
+        moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        rb2d.AddForce(moveInput * speed);
+
+        if (Input.GetKeyDown(KeyCode.Space) && !isJumping)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            rb2d.linearVelocity = new Vector2(rb2d.linearVelocity.x, jumpForce);
         }
     }
 
-    void FixedUpdate()
-    {
-        
-        rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
-    }
+   
 
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            isGround = true;
+            isJumping = false;
         }
     }
 
@@ -43,7 +45,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            isGround = false;
+            isJumping = true;
         }
     }
 }
